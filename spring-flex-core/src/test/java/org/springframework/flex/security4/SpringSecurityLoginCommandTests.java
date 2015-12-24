@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package org.springframework.flex.security3;
+package org.springframework.flex.security4;
 
+import flex.messaging.FlexContext;
+import flex.messaging.security.LoginManager;
 import org.junit.After;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.flex.core.AbstractMessageBrokerTests;
@@ -40,7 +33,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -49,8 +42,20 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
-import flex.messaging.FlexContext;
-import flex.messaging.security.LoginManager;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class SpringSecurityLoginCommandTests extends AbstractMessageBrokerTests {
 
@@ -77,7 +82,7 @@ public class SpringSecurityLoginCommandTests extends AbstractMessageBrokerTests 
         FlexContext.setThreadLocalHttpResponse(this.response);
         MockitoAnnotations.initMocks(this);
 
-        List<LogoutHandler> logoutHandlers = new ArrayList<LogoutHandler>();
+        List<LogoutHandler> logoutHandlers = new ArrayList<>();
         logoutHandlers.add(new SecurityContextLogoutHandler());
         this.cmd = new SpringSecurityLoginCommand(mgr);
         this.cmd.setLogoutHandlers(logoutHandlers);
@@ -126,12 +131,12 @@ public class SpringSecurityLoginCommandTests extends AbstractMessageBrokerTests 
 
     @Test
     public void matchingAuthority() throws Exception {
-        List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-        authorities.add(new GrantedAuthorityImpl("ROLE_USER"));
-        authorities.add(new GrantedAuthorityImpl("ROLE_ABUSER"));
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        authorities.add(new SimpleGrantedAuthority("ROLE_ABUSER"));
         Principal principal = new UsernamePasswordAuthenticationToken("foo", "bar", authorities);
 
-        List<String> roles = new ArrayList<String>();
+        List<String> roles = new ArrayList<>();
         roles.add("ROLE_ADMIN");
         roles.add("ROLE_USER");
         assertTrue("Authorization should pass", this.cmd.doAuthorization(principal, roles));
@@ -139,12 +144,12 @@ public class SpringSecurityLoginCommandTests extends AbstractMessageBrokerTests 
 
     @Test
     public void noMatchingAuthority() throws Exception {
-        List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-        authorities.add(new GrantedAuthorityImpl("ROLE_USER"));
-        authorities.add(new GrantedAuthorityImpl("ROLE_ABUSER"));
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        authorities.add(new SimpleGrantedAuthority("ROLE_ABUSER"));
         Principal principal = new UsernamePasswordAuthenticationToken("foo", "bar", authorities);
 
-        List<String> roles = new ArrayList<String>();
+        List<String> roles = new ArrayList<>();
         roles.add("ROLE_ADMIN");
         assertFalse("Authorization should not pass", this.cmd.doAuthorization(principal, roles));
     }
@@ -200,7 +205,7 @@ public class SpringSecurityLoginCommandTests extends AbstractMessageBrokerTests 
     @Test
     public void logoutWithPerClientAuthentication() throws Exception {
         
-        List<LogoutHandler> logoutHandlers = new ArrayList<LogoutHandler>();
+        List<LogoutHandler> logoutHandlers = new ArrayList<>();
         SecurityContextLogoutHandler handler = new SecurityContextLogoutHandler();
         handler.setInvalidateHttpSession(false);
         logoutHandlers.add(handler);

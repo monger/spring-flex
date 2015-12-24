@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package org.springframework.flex.security3;
+package org.springframework.flex.security4;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-
+import flex.messaging.FlexContext;
+import flex.messaging.MessageBroker;
+import flex.messaging.MessageException;
+import flex.messaging.endpoints.AMFEndpoint;
+import flex.messaging.endpoints.AbstractEndpoint;
+import flex.messaging.endpoints.Endpoint;
+import flex.messaging.messages.Message;
+import flex.messaging.security.SecurityException;
 import org.junit.After;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -48,24 +49,25 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.util.RequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
-import flex.messaging.FlexContext;
-import flex.messaging.MessageBroker;
-import flex.messaging.MessageException;
-import flex.messaging.endpoints.AMFEndpoint;
-import flex.messaging.endpoints.AbstractEndpoint;
-import flex.messaging.endpoints.Endpoint;
-import flex.messaging.messages.Message;
-import flex.messaging.security.SecurityException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class EndpointSecurityIntegrationTests extends AbstractMessageBrokerTests {
 
     private EndpointSecurityMetadataSource source;
 
-    private final AccessDecisionManager adm = new AffirmativeBased();
+    private AccessDecisionManager adm;
 
     @Mock
     private AuthenticationManager mgr;
@@ -79,15 +81,15 @@ public class EndpointSecurityIntegrationTests extends AbstractMessageBrokerTests
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>> requestMap = new LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>>();
-        List<ConfigAttribute> attrs = new ArrayList<ConfigAttribute>();
+        LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>> requestMap = new LinkedHashMap<>();
+        List<ConfigAttribute> attrs = new ArrayList<>();
         attrs.add(new SecurityConfig("ROLE_USER"));
         requestMap.put(new AntPathRequestMatcher("/messagebroker/**"), attrs);
         this.source = new EndpointSecurityMetadataSource(requestMap);
 
-        List<AccessDecisionVoter> voters = new ArrayList<AccessDecisionVoter>();
+        List<AccessDecisionVoter<?>> voters = new ArrayList<>();
         voters.add(new RoleVoter());
-        ((AffirmativeBased) this.adm).setDecisionVoters(voters);
+        adm = new AffirmativeBased(voters);
 
         initializeInterceptors();
         
@@ -102,8 +104,8 @@ public class EndpointSecurityIntegrationTests extends AbstractMessageBrokerTests
 
     @Test
     public void serviceAuthorized() throws Exception {
-        List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-        authorities.add(new GrantedAuthorityImpl("ROLE_USER"));
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
         Authentication auth = new UsernamePasswordAuthenticationToken("foo", "bar", authorities);
         SecurityContextHolder.getContext().setAuthentication(auth);
 
@@ -144,7 +146,7 @@ public class EndpointSecurityIntegrationTests extends AbstractMessageBrokerTests
     @Test
     public void serviceUnauthorized() throws Exception {
 
-        Authentication auth = new UsernamePasswordAuthenticationToken("foo", "bar", new ArrayList<GrantedAuthority>());
+        Authentication auth = new UsernamePasswordAuthenticationToken("foo", "bar", new ArrayList<>());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         MessageBroker broker = getMessageBroker();
@@ -170,9 +172,7 @@ public class EndpointSecurityIntegrationTests extends AbstractMessageBrokerTests
     @SuppressWarnings("rawtypes")
     public void startupProcessed() throws Exception {
         MessageBroker broker = getMessageBroker();
-        Iterator i = broker.getEndpoints().values().iterator();
-        while (i.hasNext()) {
-            Object endpoint = i.next();
+        for (final Object endpoint : broker.getEndpoints().values()) {
             assertTrue("Proxied endpoint1 must implement Endpoint", endpoint instanceof Endpoint);
             assertTrue("Endpoint should be proxied", AopUtils.isAopProxy(endpoint));
             assertTrue("Endpoint should be started", ((Endpoint) endpoint).isStarted());
@@ -192,7 +192,7 @@ public class EndpointSecurityIntegrationTests extends AbstractMessageBrokerTests
         MessageInterceptionAdvice interceptor = new MessageInterceptionAdvice();
         interceptor.getMessageInterceptors().add(endpointInterceptor);
 
-        List<EndpointAdvisor> advisors = new ArrayList<EndpointAdvisor>();
+        List<EndpointAdvisor> advisors = new ArrayList<>();
         advisors.add(new EndpointServiceMessagePointcutAdvisor(translator));
         advisors.add(new EndpointServiceMessagePointcutAdvisor(interceptor));
 

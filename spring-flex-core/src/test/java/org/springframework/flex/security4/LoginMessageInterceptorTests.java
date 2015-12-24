@@ -14,7 +14,19 @@
  * limitations under the License.
  */
 
-package org.springframework.flex.security3;
+package org.springframework.flex.security4;
+
+import flex.messaging.messages.AcknowledgeMessage;
+import flex.messaging.messages.CommandMessage;
+import flex.messaging.messages.Message;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.MockitoAnnotations;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,18 +35,6 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.MockitoAnnotations;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
-import org.springframework.security.core.context.SecurityContextHolder;
-
-import flex.messaging.messages.AcknowledgeMessage;
-import flex.messaging.messages.CommandMessage;
-import flex.messaging.messages.Message;
 
 public class LoginMessageInterceptorTests {
 
@@ -61,8 +61,8 @@ public class LoginMessageInterceptorTests {
     @Test
     @SuppressWarnings("rawtypes")
     public void postProcessSuccessfulLogin() {
-        List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-        authorities.add(new GrantedAuthorityImpl("ROLE_USER"));
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
         Authentication auth = new UsernamePasswordAuthenticationToken("foo", "bar", authorities);
         SecurityContextHolder.getContext().setAuthentication(auth);
 

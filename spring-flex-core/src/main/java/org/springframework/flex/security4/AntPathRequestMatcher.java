@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.springframework.flex.security3;
+package org.springframework.flex.security4;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.security.web.util.RequestMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.Assert;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Matcher which compares a pre-defined ant-style pattern against the URL
@@ -49,7 +49,7 @@ import org.springframework.util.Assert;
  * @see org.springframework.util.AntPathMatcher
  */
 public final class AntPathRequestMatcher implements RequestMatcher {
-    private static final Log logger = LogFactory.getLog(AntPathRequestMatcher.class);
+    private static final Logger logger = LoggerFactory.getLogger(AntPathRequestMatcher.class);
     private static final String MATCH_ALL = "/**";
 
     private final Matcher matcher;

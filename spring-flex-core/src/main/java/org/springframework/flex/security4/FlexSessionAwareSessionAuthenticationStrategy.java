@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package org.springframework.flex.security3;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.session.SessionAuthenticationException;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+package org.springframework.flex.security4;
 
 import flex.messaging.FlexSession;
 import flex.messaging.HttpFlexSession;
 import flex.messaging.HttpFlexSessionProvider;
 import flex.messaging.MessageBroker;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.session.SessionAuthenticationException;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * Delegating implementation of {@link SessionAuthenticationStrategy} that ensures proper handling of the {@link FlexSession} 

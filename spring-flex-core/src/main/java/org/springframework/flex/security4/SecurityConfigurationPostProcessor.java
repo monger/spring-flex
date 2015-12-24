@@ -14,17 +14,9 @@
  * limitations under the License.
  */
 
-package org.springframework.flex.security3;
+package org.springframework.flex.security4;
 
-import java.beans.PropertyDescriptor;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.Filter;
-
+import flex.messaging.FlexSession;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
@@ -38,6 +30,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.flex.core.ExceptionTranslator;
 import org.springframework.security.web.FilterChainProxy;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -45,7 +38,13 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 
-import flex.messaging.FlexSession;
+import javax.servlet.Filter;
+import java.beans.PropertyDescriptor;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Infrastructure class for setting up the necessary integration points with Spring Security.
@@ -117,7 +116,7 @@ public class SecurityConfigurationPostProcessor implements MergedBeanDefinitionP
 			Map<String, FlexAuthenticationEntryPoint> entryPoints = BeanFactoryUtils.beansOfTypeIncludingAncestors(context, FlexAuthenticationEntryPoint.class);
 			for (FlexAuthenticationEntryPoint entryPoint: entryPoints.values()) {
 				if (CollectionUtils.isEmpty(entryPoint.getExceptionTranslators())) {
-					entryPoint.setExceptionTranslators(new HashSet<ExceptionTranslator>(exceptionTranslators.values()));
+					entryPoint.setExceptionTranslators(new HashSet<>(exceptionTranslators.values()));
 				}
 			}
 		}
@@ -155,11 +154,12 @@ public class SecurityConfigurationPostProcessor implements MergedBeanDefinitionP
     	private final Set<Filter> filters;
     	
     	public FilterChainAccessor(FilterChainProxy proxy) {    		
-    		this.filters = new LinkedHashSet<Filter>();
+    		this.filters = new LinkedHashSet<>();
 
-            for (List<Filter> filters : proxy.getFilterChainMap().values()) {
-                this.filters.addAll(filters);
-            }
+			for (SecurityFilterChain securityFilterChain : proxy.getFilterChains()) {
+				List<Filter> fs = securityFilterChain.getFilters();
+				this.filters.addAll(fs);
+			}
     	}
     	
     	public Set<Filter> getFilters() {

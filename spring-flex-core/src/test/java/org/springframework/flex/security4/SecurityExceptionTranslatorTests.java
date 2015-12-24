@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package org.springframework.flex.security3;
+package org.springframework.flex.security4;
 
+import flex.messaging.MessageException;
+import flex.messaging.security.SecurityException;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.AuthenticationException;
 
-import flex.messaging.MessageException;
-import flex.messaging.security.SecurityException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import org.junit.Before;
-import org.junit.Test;
 
 public class SecurityExceptionTranslatorTests {
 

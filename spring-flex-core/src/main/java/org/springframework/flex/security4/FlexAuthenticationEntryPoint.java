@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package org.springframework.flex.security3;
+package org.springframework.flex.security4;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Set;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import flex.messaging.MessageException;
+import flex.messaging.io.MessageIOConstants;
+import flex.messaging.io.amf.ActionMessage;
+import flex.messaging.io.amf.MessageBody;
+import flex.messaging.messages.ErrorMessage;
+import flex.messaging.messages.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.flex.core.ExceptionTranslator;
 import org.springframework.flex.http.AmfHttpMessageConverter;
 import org.springframework.http.HttpInputMessage;
@@ -40,12 +38,12 @@ import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.util.CollectionUtils;
 
-import flex.messaging.MessageException;
-import flex.messaging.io.MessageIOConstants;
-import flex.messaging.io.amf.ActionMessage;
-import flex.messaging.io.amf.MessageBody;
-import flex.messaging.messages.ErrorMessage;
-import flex.messaging.messages.Message;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * An {@link AuthenticationEntryPoint} implementation to be used in conjunction with an authentication 
@@ -71,7 +69,7 @@ import flex.messaging.messages.Message;
  */
 public class FlexAuthenticationEntryPoint extends Http403ForbiddenEntryPoint {
 
-	private static final Log log = LogFactory.getLog(FlexAuthenticationEntryPoint.class);
+	private static final Logger log = LoggerFactory.getLogger(FlexAuthenticationEntryPoint.class);
 	
 	private static final ExceptionTranslator DEFAULT_TRANSLATOR = new SecurityExceptionTranslator(); 
 	
@@ -105,7 +103,7 @@ public class FlexAuthenticationEntryPoint extends Http403ForbiddenEntryPoint {
             return;
 		}
 		
-		ActionMessage deserializedInput = null;
+		ActionMessage deserializedInput;
 		try {
 			deserializedInput = (ActionMessage) this.converter.read(ActionMessage.class, inputMessage); 
 		} catch (HttpMessageNotReadableException ex) {
@@ -119,13 +117,13 @@ public class FlexAuthenticationEntryPoint extends Http403ForbiddenEntryPoint {
 	            if (translator.handles(authException.getClass())) {
 	                MessageException result = translator.translate(authException);
 	                ErrorMessage err = result.createErrorMessage();
-                	MessageBody body = (MessageBody) ((ActionMessage) deserializedInput).getBody(0);
+                	MessageBody body = deserializedInput.getBody(0);
                 	Message amfInputMessage = body.getDataAsMessage(); 
                 	err.setCorrelationId(amfInputMessage.getMessageId());
                 	err.setDestination(amfInputMessage.getDestination());
                 	err.setClientId(amfInputMessage.getClientId());
                 	ActionMessage responseMessage = new ActionMessage();
-                    responseMessage.setVersion(((ActionMessage)deserializedInput).getVersion());
+                    responseMessage.setVersion((deserializedInput).getVersion());
                     MessageBody responseBody = new MessageBody();
                     responseMessage.addBody(responseBody);
                     responseBody.setData(err);

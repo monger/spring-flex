@@ -37,7 +37,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.flex.config.BeanIds;
 import org.springframework.flex.config.FlexConfigurationManager;
 import org.springframework.flex.config.RuntimeEnvironment;
-import org.springframework.flex.security3.AntPathRequestMatcher;
+import org.springframework.flex.security4.AntPathRequestMatcher;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;

@@ -1,19 +1,5 @@
 
-package org.springframework.flex.security3;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.servlet.ServletException;
-
-import org.springframework.flex.core.ExceptionTranslator;
-import org.springframework.flex.core.io.domain.Person;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+package org.springframework.flex.security4;
 
 import flex.messaging.MessageException;
 import flex.messaging.io.MessageIOConstants;
@@ -25,11 +11,24 @@ import flex.messaging.io.amf.AmfMessageSerializer;
 import flex.messaging.io.amf.MessageBody;
 import flex.messaging.messages.CommandMessage;
 import flex.messaging.messages.ErrorMessage;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.flex.core.ExceptionTranslator;
+import org.springframework.flex.core.io.domain.Person;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+
+import javax.servlet.ServletException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.junit.Before;
-import org.junit.Test;
 
 public class FlexAuthenticationEntryPointTests {
 
@@ -61,7 +60,7 @@ public class FlexAuthenticationEntryPointTests {
         this.request.setContent(amfBytes.toByteArray());
 
         FlexAuthenticationEntryPoint entryPoint = new FlexAuthenticationEntryPoint();
-        Set<ExceptionTranslator> translators = new HashSet<ExceptionTranslator>();
+        Set<ExceptionTranslator> translators = new HashSet<>();
         translators.add(new TestExceptionTranslator());
         entryPoint.setExceptionTranslators(translators);
         entryPoint.commence(this.request, this.response, new TestAuthenticationException());
@@ -121,10 +120,7 @@ public class FlexAuthenticationEntryPointTests {
     private static class TestExceptionTranslator implements ExceptionTranslator {
 
         public boolean handles(Class<?> clazz) {
-            if (clazz.equals(TestAuthenticationException.class)) {
-                return true;
-            }
-            return false;
+            return clazz.equals(TestAuthenticationException.class);
         }
 
         public MessageException translate(Throwable t) {

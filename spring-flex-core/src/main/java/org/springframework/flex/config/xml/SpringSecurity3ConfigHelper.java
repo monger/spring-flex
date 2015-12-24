@@ -16,12 +16,12 @@
 
 package org.springframework.flex.config.xml;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
 import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementation of {@link SpringSecurityConfigHelper} that is specific to Spring Security 3 and above.
@@ -30,19 +30,19 @@ import org.springframework.util.StringUtils;
  */
 public class SpringSecurity3ConfigHelper implements SpringSecurityConfigHelper {
 
-    private static final String LOGIN_COMMAND_CLASS_NAME = "org.springframework.flex.security3.SpringSecurityLoginCommand";
+    private static final String LOGIN_COMMAND_CLASS_NAME = "org.springframework.flex.security4.SpringSecurityLoginCommand";
     
-    private static final String SECURITY_CONFIG_POST_PROCESSOR_CLASS_NAME = "org.springframework.flex.security3.SecurityConfigurationPostProcessor";
+    private static final String SECURITY_CONFIG_POST_PROCESSOR_CLASS_NAME = "org.springframework.flex.security4.SecurityConfigurationPostProcessor";
 
-    private static final String ENDPOINT_INTERCEPTOR_CLASS_NAME = "org.springframework.flex.security3.EndpointInterceptor";
+    private static final String ENDPOINT_INTERCEPTOR_CLASS_NAME = "org.springframework.flex.security4.EndpointInterceptor";
 
-    private static final String ENDPOINT_DEFINITION_SOURCE_CLASS_NAME = "org.springframework.flex.security3.EndpointSecurityMetadataSource";
+    private static final String ENDPOINT_DEFINITION_SOURCE_CLASS_NAME = "org.springframework.flex.security4.EndpointSecurityMetadataSource";
 
-    private static final String LOGIN_MESSAGE_INTERCEPTOR_CLASS_NAME = "org.springframework.flex.security3.LoginMessageInterceptor";
+    private static final String LOGIN_MESSAGE_INTERCEPTOR_CLASS_NAME = "org.springframework.flex.security4.LoginMessageInterceptor";
     
-    private static final String PER_CLIENT_AUTHENTICATION_INTERCEPTOR_CLASS_NAME = "org.springframework.flex.security3.PerClientAuthenticationInterceptor";
+    private static final String PER_CLIENT_AUTHENTICATION_INTERCEPTOR_CLASS_NAME = "org.springframework.flex.security4.PerClientAuthenticationInterceptor";
     
-    private static final String SECURITY_EXCEPTION_TRANSLATOR_CLASS_NAME = "org.springframework.flex.security3.SecurityExceptionTranslator";
+    private static final String SECURITY_EXCEPTION_TRANSLATOR_CLASS_NAME = "org.springframework.flex.security4.SecurityExceptionTranslator";
     
     public String getAccessManagerId() {
         // In Spring Security 3, the AccessDecisionManager no longer gets assigned a well-known default ID

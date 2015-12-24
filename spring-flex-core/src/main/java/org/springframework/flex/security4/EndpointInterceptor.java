@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package org.springframework.flex.security3;
+package org.springframework.flex.security4;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import flex.messaging.endpoints.AbstractEndpoint;
+import flex.messaging.messages.CommandMessage;
+import flex.messaging.messages.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.flex.core.MessageInterceptor;
 import org.springframework.flex.core.MessageProcessingContext;
 import org.springframework.security.access.AccessDecisionVoter;
@@ -29,9 +31,8 @@ import org.springframework.security.access.vote.AffirmativeBased;
 import org.springframework.security.access.vote.AuthenticatedVoter;
 import org.springframework.security.access.vote.RoleVoter;
 
-import flex.messaging.endpoints.AbstractEndpoint;
-import flex.messaging.messages.CommandMessage;
-import flex.messaging.messages.Message;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Security interceptor that secures messages being passed to BlazeDS endpoints based on the security attributes
@@ -44,7 +45,9 @@ public class EndpointInterceptor extends AbstractSecurityInterceptor implements 
     private static final String STATUS_TOKEN = "_enpointInterceptorStatusToken";
 
     private EndpointSecurityMetadataSource securityMetadataSource;
-    
+
+    private static final Logger log = LoggerFactory.getLogger(EndpointInterceptor.class);
+
     @Override
     public void afterPropertiesSet() throws Exception {
         if (getAccessDecisionManager() == null) {
@@ -80,6 +83,7 @@ public class EndpointInterceptor extends AbstractSecurityInterceptor implements 
      * {@inheritDoc}
      */
     public Message postProcess(MessageProcessingContext context, Message inputMessage, Message outputMessage) {
+        log.trace("Postprocessing authentication.");
         if (context.getAttributes().containsKey(STATUS_TOKEN)) {
             InterceptorStatusToken token = (InterceptorStatusToken) context.getAttributes().get(STATUS_TOKEN);
             return (Message) afterInvocation(token, outputMessage);
@@ -93,6 +97,7 @@ public class EndpointInterceptor extends AbstractSecurityInterceptor implements 
      * {@inheritDoc}
      */
     public Message preProcess(MessageProcessingContext context, Message inputMessage) {
+        log.trace("Preprocessing authentication.");
         if (!isPassThroughCommand(inputMessage)) {
             InterceptorStatusToken token = beforeInvocation(context.getMessageTarget());
             context.getAttributes().put(STATUS_TOKEN, token);
@@ -110,11 +115,10 @@ public class EndpointInterceptor extends AbstractSecurityInterceptor implements 
     }
 
 	private void configureDefaultAccessDecisionManager() {
-        AffirmativeBased adm = new AffirmativeBased();
-        List<AccessDecisionVoter> voters = new ArrayList<AccessDecisionVoter>();
+        List<AccessDecisionVoter<?>> voters = new ArrayList<>();
         voters.add(new RoleVoter());
         voters.add(new AuthenticatedVoter());
-        adm.setDecisionVoters(voters);
+        AffirmativeBased adm = new AffirmativeBased(voters);
         setAccessDecisionManager(adm);
     }
     

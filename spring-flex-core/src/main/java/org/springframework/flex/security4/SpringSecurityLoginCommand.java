@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package org.springframework.flex.security3;
+package org.springframework.flex.security4;
 
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import flex.messaging.FlexContext;
+import flex.messaging.io.MessageIOConstants;
+import flex.messaging.security.LoginCommand;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.flex.config.MessageBrokerConfigProcessor;
 import org.springframework.flex.core.MessageBrokerFactoryBean;
@@ -44,9 +38,13 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
-import flex.messaging.FlexContext;
-import flex.messaging.io.MessageIOConstants;
-import flex.messaging.security.LoginCommand;
+import javax.servlet.ServletConfig;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Custom BlazeDS {@link LoginCommand} that uses Spring Security for Authentication and Authorization.

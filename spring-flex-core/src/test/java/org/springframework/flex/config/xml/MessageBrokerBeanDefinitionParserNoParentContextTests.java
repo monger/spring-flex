@@ -1,24 +1,24 @@
 package org.springframework.flex.config.xml;
 
-import java.util.Iterator;
-
+import flex.messaging.MessageBroker;
+import flex.messaging.security.LoginCommand;
+import org.junit.Test;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.flex.config.AbstractFlexConfigurationTests;
 import org.springframework.flex.core.ExceptionTranslationAdvice;
 import org.springframework.flex.core.MessageInterceptionAdvice;
-import org.springframework.flex.security3.SecurityConfigurationPostProcessor;
-import org.springframework.flex.security3.SpringSecurityLoginCommand;
+import org.springframework.flex.security4.SecurityConfigurationPostProcessor;
+import org.springframework.flex.security4.SpringSecurityLoginCommand;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import flex.messaging.MessageBroker;
-import flex.messaging.security.LoginCommand;
+import java.util.Iterator;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import org.junit.Test;
 
 @ContextConfiguration("classpath:/org/springframework/flex/config/secured-message-broker.xml")
 public class MessageBrokerBeanDefinitionParserNoParentContextTests extends AbstractFlexConfigurationTests {

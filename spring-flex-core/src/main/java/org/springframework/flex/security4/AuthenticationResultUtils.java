@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package org.springframework.flex.security3;
+package org.springframework.flex.security4;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Helper that ensures consistent handling of a Spring Security {@link Authentication}, providing translation to a structure that will be
@@ -40,6 +42,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
  * @author Jeremy Grelle
  */
 public abstract class AuthenticationResultUtils {
+    private static final Logger log = LoggerFactory.getLogger(AuthenticationResultUtils.class);
 
     /**
      * Checks for an {@link Authentication} object in the current {@link SecurityContext} and if one is found, constructs and returns
@@ -49,10 +52,12 @@ public abstract class AuthenticationResultUtils {
     public static Map<String, Object> getAuthenticationResult() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
+            log.trace("Got null authentication");
             return null;
         }
-        Map<String, Object> authenticationResult = new HashMap<String, Object>();
+        Map<String, Object> authenticationResult = new HashMap<>();
         authenticationResult.put("name", authentication.getName());
+        log.trace("Authenticated name: {}", authentication.getName());
         String[] authorities = new String[authentication.getAuthorities().size()];
         int i=0;
         for (GrantedAuthority granted : authentication.getAuthorities()) {
